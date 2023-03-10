@@ -37,13 +37,14 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
     - run: scripts/prisma.sh generate --schema=crates/dojo-indexer/prisma/schema.prisma
     
-    - uses: actions/cache@v2
-      name: Cache Setup
+    - uses: actions/cache@v3
       with:
         path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
         key: ${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Build
@@ -53,7 +54,7 @@ jobs:
     - name: Create Tarball
       run: >
         tar -C target/release -czvf ${{ matrix.artifact_name }} 
-        dojo dojo-indexer dojo-language-server dojo-test prisma-cli && ls
+        dojo dojo-indexer dojo-language-server dojo-test prisma-cli
 
     - name: Upload Binaries
       uses: svenstaro/upload-release-action@v2
@@ -62,4 +63,3 @@ jobs:
         file: ${{ matrix.artifact_name }}
         asset_name: ${{ matrix.asset_name }}
         tag: ${{ github.ref }}
-        
