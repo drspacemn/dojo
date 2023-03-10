@@ -27,10 +27,14 @@ jobs:
       with:
         profile: minimal
         toolchain: nightly-2022-11-03
-
-    - name: Prisma Generate
-      run: |
-        scripts/prisma.sh generate --schema=crates/dojo-indexer/prisma/schema.prisma
+    - uses: Swatinem/rust-cache@v2
+      with:
+        cache-directories: |
+          /home/runner/.cache/prisma
+    - uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - run: scripts/prisma.sh generate --schema=crates/dojo-indexer/prisma/schema.prisma
 
     - name: Build
       run: |
